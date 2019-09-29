@@ -47,7 +47,7 @@ ${C_SO_NAME} : ${OBJS}
 .PHONY: install
 install:
 	$(INSTALL) -d $(INST_LUADIR)/resty/
-	$(INSTALL) lib/resty/*.lua $(INST_LUADIR)/resty/
+	$(INSTALL) lib/*.lua $(INST_LUADIR)/resty/
 	$(INSTALL) $(C_SO_NAME) $(INST_LIBDIR)/
 
 
