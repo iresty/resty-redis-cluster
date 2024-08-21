@@ -161,7 +161,7 @@ local function try_hosts_slots(self, serv_list)
                 --ngx.log(ngx.NOTICE, "finished initializing slotcache...")
                 slot_cache[self.config.name] = slots
                 slot_cache[self.config.name .. "serv_list"] = servers
-                ngx.log(ngx.NOTICE, "servers cnt: " .. #servers.serv_list)
+                ngx.log(ngx.NOTICE, "servers cnt: ", #servers.serv_list)
             else
                 table_insert(errors, err)
             end
