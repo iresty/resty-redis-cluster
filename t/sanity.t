@@ -930,3 +930,46 @@ GET /t
 --- timeout: 3
 --- no_error_log
 [alert]
+
+=== TEST 14: test server list cnt
+--- http_config eval: $::HttpConfig
+--- config
+    location /t {
+        content_by_lua '
+            local config = {
+                            name = "testCluster",                   --rediscluster name
+                            serv_list = {                           --redis cluster node list(host and port),
+                                            { ip = "127.0.0.1", port = 7000 },
+                                            { ip = "127.0.0.1", port = 7001 },
+                                            { ip = "127.0.0.1", port = 7002 },
+                                            { ip = "127.0.0.1", port = 7003 },
+                                            { ip = "127.0.0.1", port = 7004 },
+                                            { ip = "127.0.0.1", port = 7005 },
+                                            { ip = "127.0.0.1", port = 7006 }
+                                        },
+                            keepalive_timeout = 60000,              --redis connection pool idle timeout
+                            keepalive_cons = 1000,                  --redis connection pool size
+                            connect_timeout = 1000,               --timeout while connecting
+                            read_timeout = 200,                     --timeout while reading
+                            send_timeout = 1000,                    --timeout while sending
+                            max_redirection = 5                     --maximum retry attempts for redirection
+                            
+            }
+            package.loaded["resty.rediscluster"] = nil
+            local redis = require "resty.rediscluster"
+            local red, err = redis:new(config)
+
+            if err then
+                ngx.say("failed to create: ", err)
+                return
+            end
+
+            ngx.say("connected")
+        ';
+    }
+--- request
+GET /t
+--- response_body_like
+^.*timeout.*$
+--- error_log
+try_hosts_slots(): serv_list size: 7
