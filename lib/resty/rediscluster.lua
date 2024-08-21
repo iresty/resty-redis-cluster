@@ -98,6 +98,7 @@ end
 
 local function try_hosts_slots(self, serv_list)
     local errors = {}
+    local serv_dup_check = {}
     local config = self.config
     if #serv_list < 1 then
         return nil, "failed to fetch slots, serv_list config is empty"
@@ -141,7 +142,11 @@ local function try_hosts_slots(self, serv_list)
 
                     -- generate new list of servers
                     for j = 3, #sub_info do
-                      servers.serv_list[#servers.serv_list + 1 ] = { ip = sub_info[j][1], port = sub_info[j][2] }
+                        local key = tostring(sub_info[j][1]) .. tostring(sub_info[j][2])
+                        if not serv_dup_check[key] then
+                            servers.serv_list[#servers.serv_list + 1] = { ip = sub_info[j][1], port = sub_info[j][2] }
+                            serv_dup_check[key] = true
+                        end
                     end
 
                     for slot = start_slot, end_slot do
@@ -156,6 +161,7 @@ local function try_hosts_slots(self, serv_list)
                 --ngx.log(ngx.NOTICE, "finished initializing slotcache...")
                 slot_cache[self.config.name] = slots
                 slot_cache[self.config.name .. "serv_list"] = servers
+                ngx.log(ngx.NOTICE, "servers cnt: ", #servers.serv_list)
             else
                 table_insert(errors, err)
             end
